@@ -1,20 +1,39 @@
 pipeline {
   agent {
     node {
-      label 'Jenkins-ssh'
+      label 'docker-jenkins'
     }
-    
   }
+
+  options {
+    timestamps()
+  }
+
   stages {
-    stage('checkout') {
+    stage('Code Checkout') {
       steps {
-        git(url: 'git@github.com:practicaljenkins/python-project.git', branch: 'master', credentialsId: '597e1eb7-0133-469d-90f4-cf78e915c456')
+        checkout scm
       }
     }
-    stage('build') {
-      steps {
-        sh 'python *test.py'
+    stage('Build') {
+      parallel {
+        stage ('First Test') {
+          steps {
+            echo 'Run First Test here...'
+          }
+        }
+        stage('Second Test') {
+          steps {
+            echo 'Run Second Test here...'
+          }
+        }
       }
+    }
+  }
+
+  post {
+    failure {
+      mail bcc: '', body: '', cc: '', from: '', replyTo: '', subject: 'Jenkins job failure', to: 'practical.jenkins.course@gmail.com'
     }
   }
 }
